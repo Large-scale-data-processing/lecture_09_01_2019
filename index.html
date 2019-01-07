@@ -4,9 +4,8 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Lecture 28.11.2018 - Spark</title>
+    <title>Lecture 09.01.2019 - Flink</title>
 
-    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
     <meta name="author" content="Roman Bartusiak">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -49,7 +48,7 @@
         <!-- Any section element inside of this container is displayed as a slide -->
         <div class="slides">
             <section>
-                <h1>Apache Spark</h1>
+                <h1>Apache Flink</h1>
                 <h3>Roman Bartusiak</h3>
             </section>
 
@@ -57,9 +56,9 @@
                 <section>
                     <h2>General</h2>
                     <ul>
-                        <li>University of California</li>
-                        <li>UC Berkeley AMPLab</li>
-                        <li>Matei Zaharia PhD Thesis</li>
+                        <li>Stephan Ewen</li>
+                        <li>data Artisans</li>
+                        <li>TU Berlin</li>
                         <li>Huge community</li>
                         <li>JVM</li>
                     </ul>
@@ -67,698 +66,409 @@
             </section>
             <section>
                 <section>
-                    <h2>Spark architecture</h2>
-                    <img src="img/spark-architecture.png" alt="Spark architecture">
+                    <h2>Dataflow programming model</h2>
+                    <img src="img/flink-abstractions.svg" alt="" style="width:80%"/>
                 </section>
                 <section>
                     <ul>
-                        <li>one Driver - many Workers</li>
-                        <li>Each application in separate JVM</li>
-                        <li>Driver needs to be accesible from workers</li>
+                        <li>Stateful streams</li>
+                        <li>DataStream</li>
+                        <li>Table API - under development</li>
+                        <li>SQL - under development</li>
                     </ul>
                 </section>
                 <section>
                     <ul>
-                        <li>Appication - our main()</li>
-                        <li>Driver - executes our main(), schedules DAG</li>
-                        <li>Executor - each worker spawns executors in order to run tasks of our application</li>
+                        <li>Source</li>
+                        <li>Transformation</li>
+                        <li>Sink</li>
                     </ul>
                 </section>
                 <section>
-                    Tune executors per worker
-                    <ul>
-                        <li>
-                            too small executors - unnecessary overhead
-                        </li>
-                        <li>
-                            too big executors - IO issues, failure recovery issues
-                        </li>
-                        <li>
-                            keep balance 
-                            <ul>
-                                <li>
-                                    5 cores per executor?
-                                </li>
-                                <li>
-                                    leave core for IO (HDFS, Lustre, ...)
-                                </li>
-                                <li>
-                                    leave resources for application manager and other overheads
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>DAG</h3>
-                    <ul>
-                        <li>Directed Acyclic Graph</li>
-                        <li>Represents computations</li>
-                        <li>We are not doing computations in our code, we are creating DAGs and executing them</li>
-                    </ul>
-                </section>
-                <section>
-                    <img src="img/spark-dag.png" alt="">
+                    <img src="img/flink-dag.svg" alt="" style="width:80%">
                 </section>
                 <section>
                     <ul>
                         <li>
-                            Application
+                            Program
                             <ol>
                                 <li>
-                                    Job
+                                    Task
                                     <ol>
                                         <li>
-                                            Stage eg. map
-                                            <ul>
-                                                <li>
-                                                    Task
-                                                </li>
-                                                <li>
-                                                    Task
-                                                </li>
-                                                <li>
-                                                    ...
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            Stage eg. reduce
-                                        </li>
-                                        <li>
-                                            ...
-                                        </li>
-                                    </ol>
-                                </li>
-                                <li>
-                                    Job
-                                </li>
-                                <li>
-                                    ...
-                                </li>
-                            </ol>
-                        </li>
-                    </ul>
+                                            Subtask
+                                            <li>
+                                                Subtask
+                                            </li>
+                                            <li>
+                                                ...
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        Task
+                                    </li>
+                                    <li>
+                                        ...
+                                    </li>
+                                </ol>
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Dataflow Graph</h3>
+                        <ul>
+                            <li>Directed Acyclic Graph - but not exactly</li>
+                            <li>Represents computations</li>
+                            <li>We are not doing computations in our code, we are creating graphs and executing them</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Parallelism</h3>
+                        <ul>
+                            <li>operator</li>
+                            <li>execution environent</li>
+                            <li>client</li>
+                            <li>system wide</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Data transport</h3>
+                        <ul>
+                            <li>one-to-one - preserver ordering and partitioning</li>
+                            <li>redistributing - each event can have different target subtask</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/flink-dag.svg" alt="" style="width:80%">
+                    </section>
+                    <section>
+                        <h3>Windows</h3>
+                        <ul>
+                            <li>time driven</li>
+                            <li>data driven</li>
+                            <li>tumbling - no overlap</li>
+                            <li>sliding - overlap</li>
+                            <li>session - punctuated by inactivity</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/flink-windows.svg" alt="" style="width:80%">
+                    </section>
+                    <section>
+                        <h3>Time</h3>
+                        <ul>
+                            <li>Creation</li>
+                            <li>Ingestion</li>
+                            <li>Processing</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/flink-time.svg" alt="" style="width:80%">
+                    </section>
+                    <section>
+                        <h3>Stateful Operators</h3>
+                        <ul>
+                            <li>transparent</li>
+                            <li>key/value store</li>
+                            <li>requires keyBy()</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/flink-stateful.svg" alt="" style="width:70%">
+                    </section>
+                    <section>
+                        <h3>Fault tolerance</h3>
+                        <ul>
+                            <li>stream reply</li>
+                            <li>checkpointing</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Batch</h3>
+                        <ul>
+                            <li>data as a stream source</li>
+                            <li>no checkpointing</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Flink architecture</h2>
+                        <img src="img/flink-architecture.svg" alt="Flink architecture" style="width:80%">
+                    </section>
+                    <section>
+                        <ul>
+                            <li>many Job Managers (Drivers) - many Task Managers (Workers)</li>
+                            <li>Applications are SHARING JVM</li>
+                            <li>Each node must be able to connect to all other nodes</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Flink program - our main() (or remote environment execution), defines Dataflow</li>
+                            <li>Job Manager - executes our Dataflow, schedules Dataflow graph, manages checkpointing</li>
+                            <li>Task manager - executes subtasks from Dataflow, can be configured by number of task slots</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <img src="img/flink-tasks.svg"  style="width:80%">
+                    </section>
+                    <section>
+                        Tune number of task slots per task manager
+                        <ul>
+                            <li>
+                                one task slot per task manager - spearate JVM for tasks
+                            </li>
+                            <li>
+                                more than one task slot per task manager - tasks share JVM, no CPU isolation, only memory management
+                            </li>
+                        </ul>
+                    </section>
+
                 </section>
 
+                <section>
+                    <h2>Flink components</h2>
+                    <img src="img/flink-stack.png" alt="Flink stack">
+                </section>
+                <section>
+                    <section>
+                        <h2>Runtimes</h2>
+                        <ul>
+                            <li>Local JVM</li>
+                            <li>Standalone</li>
+                            <li>YARN</li>
+                            <li>Mesos</li>
+                            <li>Cloud</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Local JVM</h3>
+                        <pre>
+                            <code class="hljs java"  data-trim data-noescape>
+                                ExecutionEnvironment.getExecutionEnvironment()
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <h3>Standalone</h3>
+                        <ul>
+                            <li>
+                                Simply: 
+                                <ul>
+                                    <li>Create configurat1ion</li>
+                                    <li>Put up job manager</li>
+                                    <li>Add task managers to cluster</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Remote</h3>
+                        <pre>
+                            <code class="hljs java"  data-trim data-noescape> 
+                                ExecutionEnvironment
+                                   .createRemoteEnvironment("flink-master",
+                                                             8081,
+                                                             "/home/user/udfs.jar");
+                            </code>
+                        </pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Basic API</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Create execution environment</li>
+                            <li>Load initial data</li>
+                            <li>Transform data</li>
+                            <li>Specify where to put results</li>
+                            <li>Execute program</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>LAZY EVALUATION</li>
+                            <li>join, coGroup, keyBy, groupBy - requires keys</li>
+                            <li>Reduce, GroupReduce, Aggregate, Windows - keys are optional</li>
+                            <li>keys are virtual</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs scala"  data-trim data-noescape> 
+                                val input: DataStream[(Int, String, Long)] = ???
+                                val keyed = input.keyBy(0)
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs scala"  data-trim data-noescape> 
+                                val input: DataSet[(Int, String, Long)] = ???
+                                val grouped = input.groupBy(0,1)
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <h3>Keys using Field Expressions</h3>
+                        <ul>
+                            <li>"field" - field name</li>
+                            <li>"_1", "0" - tuple elements </li>
+                            <li>"_1._1" - nested fields</li>
+                            <li>"_" - whole type</li>
+                        </ul>
+                    </section>
+                    <section data-background="https://media.giphy.com/media/KajpERDjOpMcw/giphy.gif">
+                        <h3>NO TYPES??!!</h3>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs scala"  data-trim data-noescape> 
+                                case class WC(word: String, count: Int)
+                                val words: DataStream[WC] = // [...]
+                                val keyed = words.keyBy( _.word )
+                            </code>
+                        </pre>
+                    </section>
+                    <section data-background="https://media.giphy.com/media/i79P9wUfnmPyo/giphy.gif">
+                        <h3>TYPES!!!</h3>
+                    </section>
+                    <section>
+                        <h3>Transformations</h3>
+                        <ul>
+                            <li>map, reduce, etc.</li>
+                            <li>rich functions</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Accumulators</h3>
+                        <ul>
+                            <li>add</li>
+                            <li>result</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>DataStream API</h2>
+                    </section>
+                    <section>
+                        <h3>Sources</h3>
+                        <ul>
+                            <li>text file</li>
+                            <li>file</li>
+                            <li>socket</li>
+                            <li>collections</li>
+                            <li>connectors</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>Sources - connectors</h4>
+                        <ul>
+                            <li>Kafka</li>
+                            <li>Amazon Kinesis</li>
+                            <li>RabitMQ</li>
+                            <li>NiFi</li>
+                            <li>Twitter</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Transformations</h3>
+                        <ul>
+                            <li>map - N -> R </li>
+                            <li>flatMap - N -> DataStream[R]</li>
+                            <li>filter - N -> N</li>
+                            <li>keyBy - N -> KeyedStream[N, K]</li>
+                            <li>reduce - N -> N</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>fold - N -> K </li>
+                            <li>sum, min, max, minBy, maxBy</li>
+                            <li>window - KeyedStream[N, K] -> WindowedStream[N, K, W]</li>
+                            <li>!!! windowAll - N -> AllWindowStream[N, W]</li>
+                            <li>union</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>join</li>
+                            <li>connect (DataStream[N], Datastream[K]) -> ConnectedStream[N, K]</li>
+                            <li>split DataStream[N] -> SplitStream[N]</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Sinks</h3>
+                        <ul>
+                            <li>text file</li>
+                            <li>CSV</li>
+                            <li>file</li>
+                            <li>socket</li>
+                            <li>connectors</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>Sinks - connectors</h4>
+                        <ul>
+                            <li>Kafka</li>
+                            <li>Cassandra</li>
+                            <li>Amazon Kinesis</li>
+                            <li>Elasticsearch</li>
+                            <li>HDFS</li>
+                            <li>RabitMQ</li>
+                            <li>NiFi</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4>Async IO</h4>
+                        <img src="img/flink-async-io.svg" >
+                    </section>
+                    <section>
+                        <h4>Buffering</h4>
+                        <ul>
+                            <li>latency</li>
+                            <li>throughput</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>DataSet API</h2>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Flink Complex Event Processing (CEP) stream</h2>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Table API & SQL - stream & batch</h2>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>FlinkML - batch</h2>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Gelly - batch</h2>
+                    </section>
+                </section>
+            </div>
 
-            </section>
-
-            <section>
-                <h2>Spark components</h2>
-                <img src="img/spark-stack.png" alt="Spark stack">
-            </section>
-            <section>
-                <section>
-                    <h2>Runtimes</h2>
-                    <ul>
-                        <li>Standalone</li>
-                        <li>YARN</li>
-                        <li>Mesos</li>
-                        <li>Kubernetes</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Standalone</h3>
-                    <ul>
-                        <li>Used in WCSS (utilizing pdsdsh)</li>
-                        <li>
-                            Simply: 
-                            <ul>
-                                <li>Put up master</li>
-                                <li>Take master address</li>
-                                <li>Put up nodes using master address</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>YARN</h3>
-                    <ul>
-                        <li>Comes from Hadoop</li>
-                        <li>Primarly only for Hadoop scheduling</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Mesos</h3>
-                    <ul>
-                        <li>UC Berkeley</li>
-                        <li>Used by Twitter, AirBnB...</li>
-                        <li>Full abstraction over resources</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Myriad</h3>
-                    <ul>
-                        <li>
-                            Mesos + YARN on same infrastructure
-                        </li>
-                        <li> YARN running in Mesos</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Kubernetes</h3>
-                    <ul>
-                        <li>Spark >= 2.3</li>
-                        <li>Kubernetes >= 1.6</li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2>Spark CORE</h2>
-                    <ul>
-                        <li>
-                            RDD - resilient distributed dataset
-                            <ul>
-                                <li>HDFS</li>
-                                <li>Hadoop API</li>
-                                <li>Directly from collections</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Accumulators
-                            <ul>
-                                <li>
-                                    Shared variables between executors
-                                </li>
-                                <li>Only add - efficient</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            Broadcast variables
-                            <ul>
-                                <li>Efficient way to distributed read-only data between executors</li>
-                                <li>
-                                    Spark optimizes communication in order to minimize overhead
-                                </li>
-                                <li>
-                                    Reduces overhead when data reused between stages
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Data partitioning</h3>
-                    <ul>
-                        <li>
-                            Each RDD is divided into partitions
-                        </li>
-                        <li>
-                            Each partition is processed by single executor
-                        </li>
-                        <li>
-                            You should have at least equal number of partitions as the number of CPUs in a cluster (taking into account data set size)
-                        </li>
-                        <li>
-                            Too big partitions - memory issues
-                        </li>
-                        <li>
-                            Too many partitions in comparison to data set size - performance issues
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            2-3 * numCores of partitions (depends on data set size)
-                        </li>
-                        <li>
-                            For big data sets - increase the number of partitions
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Shuffling</h3>
-                    <ul>
-                        <li>
-                            repartitioning
-                        </li>
-                        <li>
-                            expensive
-                            <ul>
-                                <li>
-                                    disk I/O
-                                </li>
-                                <li>
-                                    network I/O
-                                </li>
-                                <li>
-                                    serialization/deserialization
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Data transformations</h3>
-                    <ul>
-                        <li>
-                            Narrow
-                            <ul>
-                                <li>Does not require data shuffling</li>
-                                <li>map, filter ...</li>
-                                <li>Spark groups narrow transformations - pipelining</li>
-                            </ul>
-                        </li>
-                        <li>
-                            Wide
-                            <ul>
-                                <li>Requires data shuffling</li>
-                                <li>groupByKey</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    Remember about load balancing!
-                    <ul>
-                        <li>
-                            Narrow operations will not cause shuffling
-                        </li>
-                        <li>
-                            Without shuffling data can get skewed
-                        </li>
-                        <li>
-                            Skewed data -> performance problems
-                        </li>
-                        <li>
-                            repartition manually
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3 style="text-transform: none">reduceByKey, combineByKey, foldByKey vs <strike>groupByKey</strike></h3>
-                    <ul>
-                        <li>
-                            reduceByKey, combineByKey, foldByKey
-                            <ul>
-                                <li>
-                                    decrease data size that needs to be:
-                                    <ul>
-                                        <li>
-                                            saved to a disk
-                                        </li>
-                                        <li>
-                                            sent over a network
-                                        </li>
-                                        <li>
-                                            serialized
-                                        </li>
-                                        <li>
-                                            deserialized
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <img style="float: left; width: 48%; margin-right:1%" src="img/reduce_by.png" alt="">
-                    <img style="float: left; width: 48%;"  src="img/group_by.png" alt="">
-                </section>
-                <section>
-                    Persistance
-                    <ul>
-                        <li>
-                            operations are lazy
-                        </li>
-                        <li>
-                            persist results of operations, in order to reuse it
-                        </li>
-                        <li>
-                            <p>rdd.persist()</p>
-                            <p>rdd.cache()</p>
-                        </li>
-                        <li>
-                            can increase performance up to 10x
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            supports Kryo serialization
-                        </li>
-                        <li>
-                            multiple storage levels
-                        </li>
-                        <li>
-                            data can be compressed
-                        </li>
-                        <li>
-                            experimental off-heap support
-                        </li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2>Spark SQL</h2>
-                    <blockquote>
-                        Spark SQL is a new module in Apache Spark that integrates relational processing with Spark’s functional programming API.
-                    </blockquote>
-                    <blockquote>
-                        Spark SQL lets Spark programmers leverage the benefits of relational processing (e.g., declarative queries and optimized storage), and lets SQL users call complex analytics libraries in Spark (e.g., machine learning).
-                    </blockquote>
-                </section>
-                <section>
-                    <ul>
-                        <li>Utilize Spark CORE</li>
-                        <li>Represents structured and semistructured data</li>
-                        <li>
-                            Process using: 
-                            <ul>
-                                <li>SQL/HiveQL</li>
-                                <li>DataSet API</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>SQL</h3>
-                    <pre>
-                        <code class="hljs scala"  data-trim data-noescape>
-                            // Register the DataFrame as a SQL temporary view
-                            df.createOrReplaceTempView("people")
-
-                            val sqlDF = spark.sql("SELECT * FROM people")
-                            sqlDF.show()
-                            // +----+-------+
-                            // | age|   name|
-                            // +----+-------+
-                            // |null|Michael|
-                            // |  30|   Andy|
-                            // |  19| Justin|
-                            // +----+-------+
-                        </code>
-                    </pre>
-                </section>
-                <section>
-                    <h3>DataSet API</h3>
-                    <pre>
-                        <code class="hljs scala"  data-trim data-noescape>
-                            case class Person(name: String, age: Long)
-
-                            // Encoders are created for case classes
-                            val caseClassDS = Seq(Person("Andy", 32)).toDS()
-                            caseClassDS.show()
-                            // +----+---+
-                            // |name|age|
-                            // +----+---+
-                            // |Andy| 32|
-                            // +----+---+
-
-                            // Encoders for most common types are automatically
-                            //  provided by importing spark.implicits._
-                            val primitiveDS = Seq(1, 2, 3).toDS()
-                            primitiveDS.map(_ + 1).collect() // Returns: Array(2, 3, 4)
-                        </code>
-                    </pre>
-                </section>
-                <section>
-                    <pre>
-                        <code class="hljs scala"  data-trim data-noescape>
-                            // DataFrames can be converted to a Dataset by
-                            // providing a class. Mapping will be done by name
-                            val path = "examples/src/main/resources/people.json"
-                            val peopleDS = spark.read.json(path).as[Person]
-                            peopleDS.show()
-                            // +----+-------+
-                            // | age|   name|
-                            // +----+-------+
-                            // |null|Michael|
-                            // |  30|   Andy|
-                            // |  19| Justin|
-                            // +----+-------+
-                        </code>
-                    </pre>
-                </section>
-                <section>
-                    <pre>
-                        <code class="hljs scala"  data-trim data-noescape>
-                            val teenagers = primitiveDS.where('age >= 10)
-                            .where('age <= 19)
-                            .select('name).as[String]
-                            teenagers.show
-                            //    +------+
-                            //    | name |
-                            //    +------+
-                            //    |Justin|
-                            //    +------+
-
-                        </code>
-                    </pre>
-                </section>
-                <section>
-                    <pre>
-                        <code class="hljs scala"  data-trim data-noescape>
-                            val symbol = 'symbol
-                            // symbol: Symbol = 'symbol'
-                        </code>
-                    </pre>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2>Spark Streaming</h2>
-                    <ul>
-                        <li>API mix</li>
-                        <li> Structured Streaming - based on Spark SQL</li>
-                        <li> Spark Streaming - old API </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            micro-batching
-                            <ul>
-                                <li>exactly-once guarantees</li>
-                                <li>100ms latencies</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section data-background="http://i.giphy.com/90F8aUepslB84.gif">
-                    <h3>CONTINOUS STREAMING</h3>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            extremely limited continuous streaming from 2.3.0 in Structured Streaming
-                            <ul>
-                                <li>Experimental</li>
-                                <li>Lack of operations</li>
-                                <li>at-least-once guarantees</li>
-                                <li>1ms latencies</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2>Spark <span style="text-transform: none">MLlib</span></h2>
-                    <ul>
-                        <li>API mix</li>
-                        <li>large scale distributed ML</li>
-                        <li>
-                            Many features:
-                            <ul>
-                                <li>data loading</li>
-                                <li>data processing</li>
-                                <li>ml methods</li>
-                                <li>other tools</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            New dataframe API
-                            <ul>
-                                <li>pipelines</li>
-                                <li>based on DataFrames - more friendly API</li>
-                                <li>uniform API</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li> 
-                            classification
-                            <ul>
-                                <li>binary</li>
-                                <li>multi-class</li>
-                                <li>multi-label</li>
-                            </ul>
-                        </li>
-                        <li>regression</li>
-                        <li>clustering</li>
-                        <li>colaborative filtering</li>
-                        <li>frequent pattern mining</li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>hyperparameters search</li>
-                        <li>cross validation</li>
-                        <li>train test split</li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2 style="text-transform: none">GraphX</h2>
-                    <ul>
-                        <li>
-                            Graph representation using Spark
-                        </li>
-                        <li>
-                            a little of graph alghoritms
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <img src="img/edge_cut_vs_vertex_cut.png" alt="Edge cut vs Vertex cut">
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            PageRank
-                        </li>
-                        <li>
-                            Pregel
-                        </li>
-                        <li>
-                            Connected components
-                        </li>
-                        <li>
-                            Triangle counting
-                        </li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <section>
-                    <h2>Others</h2>
-                    <ul>
-                        <li>spark-shell</li>
-                        <li>GraphFrames</li>
-                        <li>Zeppelin</li>
-                        <li>Spark notebook</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3 style="text-transform: none">GraphFrames</h3>
-                    <ul>
-                        <li>
-                            Represent graphs using DataFrames 
-                        </li>
-                        <li>
-                            Might be faster than GraphX
-                        </li>
-                        <li>
-                            Smaller API
-                        </li>
-                        <li>
-                            In some places uses GraphX under the hood
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>spark-shell</h3>
-                    <ul>
-                        <li>created context</li>
-                        <li>contains imported spark API</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Zeppelin</h3>
-                    <ul>
-                        <li>
-                            creates or connect to remote context
-                        </li>
-                        <li>Helium visualization</li>
-                        <li>Collaboration</li>
-                        <li>Scheduler</li>
-                        <li>Custom dependencies</li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>Spark notebooks</h3>
-                    <li>More like iPython</li>
-                    <li>More built-in visualizations than Zeppelin</li>
-                </section>
-                <section>
-                    <h3>Spark as distribution layer</h3>
-                    <ul>
-                        <li>Train tensorflow models</li>
-                        <li>Execute any software in a cluster</li>
-                    </ul>
-                </section>
-            </section>
-            <section>
-                <img style="height:69vh" src="img/meme_1.png" alt="">
-            </section>
-
-            <section>
-                <section>
-                    <h2>Projects WWWW</h2>
-                    <ul>
-                        <li>
-                            Domain
-                            <ul>
-                                <li>https://freenom.com/</li>
-                                <li>Free monains: tk, ml ga, cf, gq</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-                <section>
-                    <ul>
-                        <li>
-                            Hosting
-                            <ul>
-                                <li>
-                                    Github gh-pages
-                                </li>
-                                <li>
-                                    Jekyll (official or custom themes)
-                                </li>
-                                <li>
-                                    Static sites
-                                </li>
-                                <li>
-                                    Look at lsdp.ml page repository (gh-pages branch)
-                                </li>
-                                <li>
-                                    Use https
-                                </li>
-                                <li>
-                                    Custom domains using redirection or CNAME file in repository
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </section>
-            </section>
         </div>
 
-    </div>
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
 
-    <script src="lib/js/head.min.js"></script>
-    <script src="js/reveal.js"></script>
-
-    <script>
+        <script>
 
             // More info https://github.com/hakimel/reveal.js#configuration
             Reveal.initialize({
