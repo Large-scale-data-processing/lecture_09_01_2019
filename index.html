@@ -295,6 +295,7 @@
                             <li>join, coGroup, keyBy, groupBy - requires keys</li>
                             <li>Reduce, GroupReduce, Aggregate, Windows - keys are optional</li>
                             <li>keys are virtual</li>
+                            <li>Immutability</li>
                         </ul>
                     </section>
                     <section>
@@ -397,9 +398,10 @@
                     </section>
                     <section>
                         <ul>
-                            <li>join</li>
+                            <li>join - interval, window</li>
                             <li>connect (DataStream[N], Datastream[K]) -> ConnectedStream[N, K]</li>
                             <li>split DataStream[N] -> SplitStream[N]</li>
+                            <li>window coGroup</li>
                         </ul>
                     </section>
                     <section>
@@ -425,6 +427,13 @@
                         </ul>
                     </section>
                     <section>
+                        <h4>Iterations</h4>
+                        <ul>
+                            <li>step function</li>
+                            <li>no maximum number of iterations</li>
+                        </ul>
+                    </section>
+                    <section>
                         <h4>Async IO</h4>
                         <img src="img/flink-async-io.svg" >
                     </section>
@@ -440,25 +449,319 @@
                     <section>
                         <h2>DataSet API</h2>
                     </section>
+                    <section>
+                        <ul>
+                            <li>DataStream for batch</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Sources</h3>
+                        <ul>
+                            <li>text</li>
+                            <li>CSV</li>
+                            <li>file</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Transformations</h3>
+                        <ul>
+                            <li>OuterJoin - left, right, full</li>
+                            <li>Cross - cartesian product</li>
+                            <li>First - first n elements</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Sinks</h3>
+                        <ul>
+                            <li>text</li>
+                            <li>CSV</li>
+                            <li>file</li>
+                            <li>output</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>locally sorted output</li>
+                            <li>NO GLOBALY SORTED OUTPUT</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Iterations</h3>
+                        <ul>
+                            <li>bulk</li>
+                            <li>delta</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Broadcast variables</h3>
+                        <pre>
+                            <code class="hljs scala"  data-trim data-noescape> 
+                                // 1. The DataSet to be broadcast
+                                val toBroadcast = env.fromElements(1, 2, 3)
+
+                                val data = env.fromElements("a", "b")
+
+                                data.map(new RichMapFunction[String, String]() {
+                                    var broadcastSet: Traversable[String] = null
+
+                                    override def open(config: Configuration): Unit = {
+                                      // 3. Access the broadcast DataSet as a Collection
+                                      broadcastSet = getRuntimeContext().getBroadcastVariable[String]("broadcastSetName").asScala
+                                    }
+
+                                    def map(in: String): String = {
+                                        ...
+                                    }
+                                }).withBroadcastSet(toBroadcast, "broadcastSetName") // 2. Broadcast the DataSet
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <h3>distributed cache</h3>
+                        <ul>
+                            <li>register file</li>
+                            <li>flink distribute file to all task managers</li>
+                            <li>read file in your rich function</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Object-Reuse</h3>
+                        <pre>
+                            <code class="hljs scala"  data-trim data-noescape> 
+                                ExecutionConfig.enableObjectReuse()
+                            </code>
+                        </pre>
+                    </section>
                 </section>
                 <section>
                     <section>
                         <h2>Flink Complex Event Processing (CEP) stream</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>detect patterns</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>singleton</li>
+                            <li>looping</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>singleton</h3>
+                        <ul>
+                            <li>match single event once</li>
+                            <li>optional</li>
+                            <li>bool logic</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>looping</h3>
+                        <ul>
+                            <li>match many occurences</li>
+                            <li>n times</li>
+                            <li>greedy</li>
+                            <li>n times or more</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Contiguity</h3>
+                        <ul>
+                            <li>strict</li>
+                            <li>relaxed</li>
+                            <li>non-deterministic relaxed </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>skip strategy</h3>
+                        <ul>
+                            <li>how many times assign event to match?</li>
+                            <li>no skip</li>
+                            <li>to next</li>
+                            <li>skip past last</li>
+                            <li>to first</li>
+                            <li>to last</li>
+                        </ul>
                     </section>
                 </section>
                 <section>
                     <section>
                         <h2>Table API & SQL - stream & batch</h2>
                     </section>
+                    <section>
+                        <ul>
+                            <li>DEV</li>
+                            <li>batch</li>
+                            <li>stream</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Table sources</h3>
+                        <ul>
+                            <li>view</li>
+                            <li>external source</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>time</h3>
+                        <ul>
+                            <li>processing - default</li>
+                            <li>ingestion</li>
+                            <li>event</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>temporal table function</h3>
+                        <ul>
+                            <li>temporal table</li>
+                            <li>simplify queries</li>
+                            <li>reuse function in SQL</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs sql"  data-trim data-noescape>
+                                SELECT * FROM RatesHistory;
+
+                                rowtime currency   rate
+                                ======= ======== ======
+                                09:00   US Dollar   102
+                                09:00   Euro        114
+                                09:00   Yen           1
+                                10:45   Euro        116
+                                11:15   Euro        119
+                                11:49   Pounds      108
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs sql"  data-trim data-noescape>
+                                SELECT *
+                                FROM RatesHistory AS r
+                                WHERE r.rowtime = (
+                                  SELECT MAX(rowtime)
+                                  FROM RatesHistory AS r2
+                                  WHERE r2.currency = r.currency
+                                  AND r2.rowtime <= TIME '10:58');
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs sql"  data-trim data-noescape>
+                                rowtime currency   rate
+                                ======= ======== ======
+                                09:00   US Dollar   102
+                                09:00   Yen           1
+                                10:45   Euro        116
+                            </code>
+                        </pre>
+                    </section>
+                    <section>
+                        <pre>
+                            <code class="hljs sql"  data-trim data-noescape>
+                                SELECT * FROM Rates('11:00');
+
+                                rowtime currency   rate
+                                ======= ======== ======
+                                09:00   US Dollar   102
+                                10:45   Euro        116
+                                09:00   Yen           1
+                            </code>
+                        </pre>
+                    </section>
                 </section>
                 <section>
                     <section>
                         <h2>FlinkML - batch</h2>
                     </section>
+                    <section>
+                        <ul>
+                            <li>ALS - alternating least squares</li>
+                            <li>KNN</li>
+                            <li>regression</li>
+                            <li>classification</li>
+                            <li>SOS - stochastic outlier selection</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>min-max scaling</li>
+                            <li>standard scaling</li>
+                            <li>pipelines</li>
+                            <li>cross validation</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>classification - SVM</h3>
+                        <ul>
+                            <li>1 and -1 for binary classes (not 1 and 0)</li>
+                            <li>CoCoa</li>
+                        </ul>
+                    </section>
                 </section>
                 <section>
                     <section>
                         <h2>Gelly - batch</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>vertex-cetric iterations - most general</li>
+                            <li>scatter-gather - parallel by vertices</li>
+                            <li>gather-sum-apply - parallel by edges</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>methods</h3>
+                        <ul>
+                            <li>community detection</li>
+                            <li>label propagation</li>
+                            <li>connected components</li>
+                            <li>weakly connected components</li>
+                            <li>SSSP</li>
+                            <li>triangle counting</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>summarization</li>
+                            <li>
+                                clustering coefficient
+                                <ul>
+                                    <li>average</li>
+                                    <li>global</li>
+                                    <li>local</li>
+                                </ul>
+                            </li>
+                            <li>triadic census</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>triangle listing</li>
+                            <li>HITS - Hyperlink-Induced Topic Search</li>
+                            <li>PageRank</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Similarity</h3>
+                        <ul>
+                            <li>Adamic-Adar</li>
+                            <li>Jaccard Index</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>Generators</h3>
+                        <ul>
+                            <li>RMat</li>
+                            <li>grid</li>
+                            <li>complete</li>
+                            <li>cycle</li>
+                            <li>path</li>
+                            <li>star</li>
+                        </ul>
                     </section>
                 </section>
             </div>
