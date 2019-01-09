@@ -135,8 +135,8 @@
                     <section>
                         <h3>Data transport</h3>
                         <ul>
-                            <li>one-to-one - preserver ordering and partitioning</li>
-                            <li>redistributing - each event can have different target subtask</li>
+                            <li>one-to-one - preserve ordering and partitioning</li>
+                            <li>redistributing - each event can have different target subtasks</li>
                         </ul>
                     </section>
                     <section>
@@ -145,11 +145,21 @@
                     <section>
                         <h3>Windows</h3>
                         <ul>
-                            <li>time driven</li>
-                            <li>data driven</li>
-                            <li>tumbling - no overlap</li>
-                            <li>sliding - overlap</li>
-                            <li>session - punctuated by inactivity</li>
+                            <li>
+                                driven by
+                                <ul>
+                                    <li>time</li>
+                                    <li>data</li>
+                                </ul>
+                            </li>
+                            <li>
+                                type
+                                <ul>
+                                    <li>tumbling - no overlap</li>
+                                    <li>sliding - overlap</li>
+                                    <li>session - punctuated by inactivity</li>
+                                </ul>
+                            </li>
                         </ul>
                     </section>
                     <section>
@@ -257,7 +267,7 @@
                             <li>
                                 Simply: 
                                 <ul>
-                                    <li>Create configurat1ion</li>
+                                    <li>Create configuration</li>
                                     <li>Put up job manager</li>
                                     <li>Add task managers to cluster</li>
                                 </ul>
